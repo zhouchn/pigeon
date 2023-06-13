@@ -1,0 +1,21 @@
+syntax = "proto3";
+//option java_package = "io.pigeon.access";
+option java_multiple_files = true;
+
+// define person message
+message Person {
+  uint64 id = 1;
+  string name = 2;
+  int32 age = 3;
+  repeated int32 nums = 4;
+  repeated int32 integers = 5;
+  uint64 timestamp = 7;
+  Address address = 8;
+};
+
+// define address message
+message Address {
+  string city = 1;
+  string country = 2;
+  map<string, string> properties = 3;
+};

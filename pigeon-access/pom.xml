@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.zhouzc</groupId>
+        <groupId>io.pigeon</groupId>
         <artifactId>pigeon</artifactId>
         <version>${revision}</version>
     </parent>
@@ -14,6 +14,7 @@
 
     <modules>
         <module>pigeon-access-tcp</module>
+        <module>pigeon-access-codec</module>
     </modules>
 
     <properties>
@@ -24,12 +25,30 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.zhouzc</groupId>
-            <artifactId>pigeon-common</artifactId>
+            <groupId>io.pigeon.access.codec</groupId>
+            <artifactId>pigeon-access-codec</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
+            <groupId>io.pigeon</groupId>
+            <artifactId>pigeon-auth-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.pigeon</groupId>
+            <artifactId>pigeon-registry-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.pigeon</groupId>
+            <artifactId>pigeon-delivery-api</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 </project>

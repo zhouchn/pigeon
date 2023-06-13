@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.zhouzc</groupId>
+    <groupId>io.pigeon</groupId>
     <artifactId>pigeon</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
@@ -19,10 +19,13 @@
         <module>pigeon-delivery</module>
         <module>pigeon-access</module>
         <module>pigeon-messaging</module>
+        <module>pigeon-tlv</module>
     </modules>
 
     <properties>
         <revision>1.0-SNAPSHOT</revision>
+        <javac.source>17</javac.source>
+        <javac.target>17</javac.target>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -31,24 +34,61 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.zhouzc</groupId>
+                <groupId>io.pigeon</groupId>
                 <artifactId>pigeon-bom</artifactId>
                 <version>1.0-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
 
-<!--            <dependency>-->
-<!--                <groupId>io.netty</groupId>-->
-<!--                <artifactId>netty-all</artifactId>-->
-<!--            </dependency>-->
+            <dependency>
+                <groupId>io.pigeon</groupId>
+                <artifactId>pigeon-common</artifactId>
+                <version>${revision}</version>
+            </dependency>
 
             <dependency>
-                <groupId>com.zhouzc</groupId>
-                <artifactId>pigeon-common</artifactId>
+                <groupId>io.pigeon</groupId>
+                <artifactId>pigeon-auth-api</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.pigeon</groupId>
+                <artifactId>pigeon-registry-api</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.pigeon</groupId>
+                <artifactId>pigeon-delivery-api</artifactId>
                 <version>${revision}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.0</version>
+                    <configuration>
+                        <source>${javac.source}</source>
+                        <target>${javac.target}</target>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>3.1.0</version>
+                    <configuration>
+                        <verbose>true</verbose>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>
