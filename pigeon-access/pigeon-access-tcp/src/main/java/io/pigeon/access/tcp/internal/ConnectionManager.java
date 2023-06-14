@@ -15,6 +15,8 @@ import java.util.concurrent.ConcurrentSkipListMap;
  * @since 3.0.0 2023/6/12
  **/
 public class ConnectionManager {
+    public static final ConnectionManager INSTANCE = new ConnectionManager();
+
     private final ConcurrentMap<String, Channel> channelMap = new ConcurrentSkipListMap<>();
     private final ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 

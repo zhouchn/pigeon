@@ -8,8 +8,8 @@ import io.netty.channel.Channel;
  * @author chaoxi
  * @since 3.0.0 2023/6/13
  **/
-public class ChannelUtil {
-    private ChannelUtil() {
+public class Channels {
+    private Channels() {
     }
 
     public static boolean isValid(Channel channel) {

@@ -6,7 +6,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.util.Attribute;
-import io.pigeon.access.tcp.utils.ChannelUtil;
+import io.pigeon.access.tcp.utils.Channels;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledExecutorService;
@@ -37,13 +37,18 @@ public class GlobalAutoFlushHandler extends ChannelDuplexHandler implements Auto
         this.flushScheduler = scheduledExecutorService.scheduleWithFixedDelay(this::doFlush, timeoutNanos, timeoutNanos, TimeUnit.NANOSECONDS);
     }
 
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        ctx.channel().attr(FLUSH).set(Boolean.FALSE);
+        super.channelActive(ctx);
+    }
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
         super.write(ctx, msg, promise);
         // Channel 去重
         Attribute<Boolean> flushAttr = ctx.channel().attr(FLUSH);
-        if (!Boolean.TRUE.equals(flushAttr.getAndSet(Boolean.TRUE))) {
+        if (flushAttr.compareAndSet(Boolean.FALSE, Boolean.TRUE)) {
             this.channelQueue.offer(ctx.channel());
             System.out.println(ctx.channel().id() + " start ticks...");
         }
@@ -51,14 +56,15 @@ public class GlobalAutoFlushHandler extends ChannelDuplexHandler implements Auto
 
     @Override
     public void flush(ChannelHandlerContext ctx) throws Exception {
-        ctx.channel().attr(FLUSH).set(null);
+        ctx.channel().attr(FLUSH).set(Boolean.FALSE);
         super.flush(ctx);
     }
 
     private void doFlush() {
         Channel channel;
         while ((channel = channelQueue.poll()) != null) {
-            if (ChannelUtil.isInvalid(channel)) {
+            if (Channels.isInvalid(channel)) {
+                // drop invalid channels
                 continue;
             }
             if (channel.attr(FLUSH).compareAndSet(Boolean.TRUE, Boolean.FALSE)) {
@@ -72,7 +78,7 @@ public class GlobalAutoFlushHandler extends ChannelDuplexHandler implements Auto
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         // 等到下一次定时任务到达时，遍历队列中的Channel 再移除
         // this.channelQueue.remove(ctx.channel());
-        ctx.channel().attr(FLUSH).set(null);
+        ctx.channel().attr(FLUSH).set(Boolean.FALSE);
         super.channelInactive(ctx);
     }
 

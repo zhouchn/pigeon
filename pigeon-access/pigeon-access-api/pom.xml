@@ -9,8 +9,7 @@
         <version>${revision}</version>
     </parent>
 
-    <groupId>io.pigeon.access.codec</groupId>
-    <artifactId>pigeon-access-codec</artifactId>
+    <artifactId>pigeon-access-api</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -20,21 +19,16 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-buffer</artifactId>
+            <groupId>io.pigeon</groupId>
+            <artifactId>pigeon-auth-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-handler</artifactId>
+            <groupId>io.pigeon</groupId>
+            <artifactId>pigeon-registry-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.protostuff</groupId>
-            <artifactId>protostuff-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.protostuff</groupId>
-            <artifactId>protostuff-runtime</artifactId>
+            <groupId>io.pigeon</groupId>
+            <artifactId>pigeon-delivery-api</artifactId>
         </dependency>
     </dependencies>
-
 </project>

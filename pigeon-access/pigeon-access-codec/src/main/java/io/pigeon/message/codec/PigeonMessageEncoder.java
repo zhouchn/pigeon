@@ -1,4 +1,4 @@
-package io.pigeon.access.tcp.codec;
+package io.pigeon.message.codec;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -6,8 +6,6 @@ import io.netty.handler.codec.MessageToByteEncoder;
 import io.pigeon.common.entity.Message;
 import io.pigeon.common.enums.CodecType;
 import io.pigeon.common.enums.Command;
-import io.pigeon.message.codec.MessageCodecFactory;
-import io.pigeon.message.codec.PigeonMessageCodec;
 
 /**
  * <description>

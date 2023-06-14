@@ -49,6 +49,11 @@
 
             <dependency>
                 <groupId>io.pigeon</groupId>
+                <artifactId>pigeon-access-api</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.pigeon</groupId>
                 <artifactId>pigeon-auth-api</artifactId>
                 <version>${revision}</version>
             </dependency>

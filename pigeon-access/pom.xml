@@ -13,6 +13,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>pigeon-access-api</module>
         <module>pigeon-access-tcp</module>
         <module>pigeon-access-codec</module>
     </modules>
@@ -25,21 +26,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.pigeon.access.codec</groupId>
-            <artifactId>pigeon-access-codec</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>io.pigeon</groupId>
-            <artifactId>pigeon-auth-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.pigeon</groupId>
-            <artifactId>pigeon-registry-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.pigeon</groupId>
-            <artifactId>pigeon-delivery-api</artifactId>
+            <artifactId>pigeon-common</artifactId>
         </dependency>
     </dependencies>
 

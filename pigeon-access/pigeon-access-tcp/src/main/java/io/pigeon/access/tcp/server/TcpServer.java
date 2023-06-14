@@ -1,5 +1,6 @@
 package io.pigeon.access.tcp.server;
 
+import com.google.common.util.concurrent.Futures;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -18,8 +19,16 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.internal.PlatformDependent;
+import io.pigeon.access.api.PigeonServer;
+import io.pigeon.access.api.ServerOptions;
+import io.pigeon.access.tcp.internal.ConnectionManager;
+import io.pigeon.access.tcp.internal.LocalMessageSubscriber;
+import io.pigeon.delivery.api.MessageSubscriber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <description>
@@ -27,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * @author chaoxi
  * @since 3.0.0 2023/5/15
  **/
-public class TcpServer {
+public class TcpServer implements PigeonServer {
     private final Logger logger = LoggerFactory.getLogger(TcpServer.class);
     private int port;
     private Channel channel;
@@ -40,14 +49,30 @@ public class TcpServer {
      */
     private EventLoopGroup workerGroup;
 
+    private ServerOptions options = new ServerOptions();
+    private MessageSubscriber messageSubscriber;
 
-    public void listenAndServe() throws InterruptedException {
-        this.listenAndServe(this.port);
+
+    @Override
+    public PigeonServer options(ServerOptions options) {
+        this.options = options;
+        return this;
     }
 
-    public void listenAndServe(int port) throws InterruptedException {
+    @Override
+    public MessageSubscriber subscriber() {
+        return this.messageSubscriber;
+    }
+
+    public Future<Void> listenAndServe() throws InterruptedException {
+        return this.listenAndServe(this.port);
+    }
+
+    public Future<Void> listenAndServe(int port) throws InterruptedException {
         this.bossGroup = newEventLoopGroup(true);
         this.workerGroup = newEventLoopGroup(false);
+        ConnectionManager connManager = ConnectionManager.INSTANCE;
+        this.messageSubscriber = new LocalMessageSubscriber(connManager);
         ServerBootstrap bootstrap = new ServerBootstrap()
                 .group(bossGroup, workerGroup)
                 .channel(getServerSocketChannel())
@@ -56,7 +81,7 @@ public class TcpServer {
                 .childOption(ChannelOption.SO_KEEPALIVE, true) // 维持链接的活跃，清理僵尸链接
                 .childOption(ChannelOption.TCP_NODELAY, true) // 关闭延迟发送功能
                 .handler(new LoggingHandler(LogLevel.DEBUG))
-                .childHandler(new ServerHandlerInitializer(null, null, null));
+                .childHandler(new ServerHandlerInitializer(options.getRegistryService(), options.getMessageDispatcher(), options.getAuthProviderList()));
         ChannelFuture channelFuture = bootstrap.bind(port).sync();
         channelFuture.addListener((ChannelFutureListener) future -> {
             if (future.isSuccess()) {
@@ -65,6 +90,7 @@ public class TcpServer {
             }
         });
         logger.info("start http server on port[{}] {}", port, channelFuture.isSuccess());
+        return channelFuture;
     }
 
     private EventLoopGroup newEventLoopGroup(boolean boss) {
@@ -92,13 +118,21 @@ public class TcpServer {
         return NioServerSocketChannel.class;
     }
 
-    public void close() throws Exception {
+    @Override
+    public Future<Void> shutdownNow() {
         logger.info("stop http server");
-        if (channel != null) {
-            channel.close();
-        }
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
+        return channel != null ? channel.close() : Futures.immediateVoidFuture();
+    }
+
+    @Override
+    public Future<Void> shutdown(long timeout, TimeUnit unit) {
+        logger.info("stop http server");
+        long quietPeriod = Math.max(0, timeout - 1);
+        bossGroup.shutdownGracefully(quietPeriod, timeout, unit);
+        workerGroup.shutdownGracefully(quietPeriod, timeout, unit);
+        return channel != null ? channel.close() : Futures.immediateVoidFuture();
     }
 
 }

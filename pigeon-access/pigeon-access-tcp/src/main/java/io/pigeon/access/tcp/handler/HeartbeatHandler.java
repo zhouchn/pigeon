@@ -1,4 +1,4 @@
-package io.pigeon.access.tcp.server;
+package io.pigeon.access.tcp.handler;
 
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -25,10 +25,11 @@ public class HeartbeatHandler extends SimpleUserEventChannelHandler<IdleStateEve
     protected void eventReceived(ChannelHandlerContext ctx, IdleStateEvent idleStateEvent) throws Exception {
         IdleState state = idleStateEvent.state();
         if (state == IdleState.READER_IDLE) {
-            // 在规定时间内没有收到客户端的上行数据, 主动断开连接
-            System.out.println("read timeout " + ctx.channel().id());
-//            ctx.disconnect().addListener(ChannelFutureListener.CLOSE);
+            // 在规定时间内没有收到对端的数据, 主动断开连接
+            System.out.printf("[%s] [%s] [%s] read idle trigger%n", Thread.currentThread().getId(), ctx.channel().id(), System.currentTimeMillis());
+            ctx.disconnect().addListener(ChannelFutureListener.CLOSE);
         } else if (state == IdleState.WRITER_IDLE) {
+            System.out.printf("[%s] [%s] [%s] write idle trigger%n", Thread.currentThread().getId(), ctx.channel().id(), System.currentTimeMillis());
             ctx.write(PING_MESSAGE);
         }
     }

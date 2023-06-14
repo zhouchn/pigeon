@@ -17,14 +17,15 @@ import io.pigeon.delivery.api.MessageSubscriber;
  * @since 3.0.0 2023/5/21
  **/
 public class LocalMessageDispatcher implements MessageDispatcher {
-    private MessageSubscriber messageSubscriber;
+    private MessageSubscriber subscriber;
     private final RingBuffer<MessageEvent> ringBuffer;
 
     public LocalMessageDispatcher() {
         this.ringBuffer = initRingBuffer();
     }
 
-    public LocalMessageDispatcher(RingBuffer<MessageEvent> ringBuffer) {
+    public LocalMessageDispatcher(MessageSubscriber subscriber, RingBuffer<MessageEvent> ringBuffer) {
+        this.subscriber = subscriber;
         this.ringBuffer = ringBuffer;
     }
 

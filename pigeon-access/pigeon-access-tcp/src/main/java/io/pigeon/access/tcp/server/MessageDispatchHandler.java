@@ -40,9 +40,10 @@ public class MessageDispatchHandler extends SimpleChannelInboundHandler<Message>
 
     private final RegistryService registryService;
     private final MessageDispatcher messageDispatcher;
-    private final ConnectionManager connManager = new ConnectionManager();
+    private final ConnectionManager connManager;
 
     public MessageDispatchHandler(RegistryService registryService, MessageDispatcher messageDispatcher) {
+        this.connManager = ConnectionManager.INSTANCE;
         this.registryService = registryService;
         this.messageDispatcher = messageDispatcher;
     }

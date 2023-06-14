@@ -1,7 +1,6 @@
 package io.pigeon.message.codec;
 
 import io.pigeon.common.entity.Message;
-import io.pigeon.common.enums.CodecType;
 
 /**
  * <description>
@@ -21,7 +20,4 @@ public class MessageCodecFactory {
         return CODEC_ARRAY[codecType];
     }
 
-    public PigeonMessageCodec<Message> getCodec(CodecType codecType) {
-        return CODEC_ARRAY[codecType.getValue()];
-    }
 }

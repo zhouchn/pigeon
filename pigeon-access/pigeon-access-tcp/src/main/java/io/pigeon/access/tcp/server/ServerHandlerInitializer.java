@@ -4,11 +4,12 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.GlobalEventExecutor;
-import io.pigeon.access.tcp.codec.PigeonMessageDecoder;
-import io.pigeon.access.tcp.codec.PigeonMessageEncoder;
+import io.pigeon.message.codec.PigeonMessageDecoder;
+import io.pigeon.message.codec.PigeonMessageEncoder;
 import io.pigeon.access.tcp.handler.BlackHoleHandler;
 import io.pigeon.access.tcp.handler.GlobalAutoFlushHandler;
 import io.pigeon.access.tcp.handler.GlobalExceptionHandler;
+import io.pigeon.access.tcp.handler.HeartbeatHandler;
 import io.pigeon.auth.api.AuthProvider;
 import io.pigeon.delivery.api.MessageDispatcher;
 import io.pigeon.message.codec.MessageCodecFactory;
@@ -44,7 +45,7 @@ public class ServerHandlerInitializer extends ChannelInitializer<SocketChannel> 
                 .addLast(globalAutoFlushHandler)
                 .addLast(PROTOCOL_DECODER, new PigeonMessageDecoder(messageCodecFactory))
                 .addLast(PROTOCOL_ENCODER, new PigeonMessageEncoder(messageCodecFactory))
-                .addLast(new IdleStateHandler(10, 2, 0))
+                .addLast(new IdleStateHandler(60, 180, 0))
                 .addLast(new HeartbeatHandler())
                 .addLast(new AuthenticationHandler(authProviders))
                 .addLast(new BlackHoleHandler())
