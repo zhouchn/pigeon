@@ -1,4 +1,4 @@
-package io.pigeon.message.codec;
+package io.pigeon.access.codec;
 
 import io.netty.buffer.ByteBuf;
 import io.pigeon.common.entity.Message;

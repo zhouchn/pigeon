@@ -1,4 +1,4 @@
-package io.pigeon.message.codec;
+package io.pigeon.access.codec;
 
 import io.pigeon.common.entity.Message;
 

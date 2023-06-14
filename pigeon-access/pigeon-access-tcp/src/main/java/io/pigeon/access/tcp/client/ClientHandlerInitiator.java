@@ -3,11 +3,11 @@ package io.pigeon.access.tcp.client;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
-import io.pigeon.message.codec.PigeonMessageDecoder;
-import io.pigeon.message.codec.PigeonMessageEncoder;
+import io.pigeon.access.codec.MessageCodecFactory;
+import io.pigeon.access.codec.PigeonMessageDecoder;
+import io.pigeon.access.codec.PigeonMessageEncoder;
 import io.pigeon.access.tcp.handler.ChannelAutoFlushHandler;
 import io.pigeon.access.tcp.handler.HeartbeatHandler;
-import io.pigeon.message.codec.MessageCodecFactory;
 
 /**
  * <description>
