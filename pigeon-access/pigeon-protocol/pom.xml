@@ -9,8 +9,8 @@
         <version>${revision}</version>
     </parent>
 
-    <groupId>io.pigeon.access.codec</groupId>
-    <artifactId>pigeon-access-codec</artifactId>
+<!--    <groupId>io.pigeon.access</groupId>-->
+    <artifactId>pigeon-protocol</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

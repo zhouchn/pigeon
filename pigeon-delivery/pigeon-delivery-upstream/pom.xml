@@ -22,5 +22,11 @@
             <groupId>io.pigeon</groupId>
             <artifactId>pigeon-delivery-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>3.2</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 </project>

@@ -1,8 +1,9 @@
-package io.pigeon.access.codec;
+package io.pigeon.protocol.codec;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.ByteBufUtil;
+import io.netty.util.concurrent.FastThreadLocal;
 import io.pigeon.common.entity.Message;
 import io.protostuff.LinkedBuffer;
 import io.protostuff.ProtostuffIOUtil;
@@ -16,18 +17,23 @@ import java.io.OutputStream;
 import java.util.Arrays;
 
 /**
- * <description>
+ * protobuf codec
  *
  * @author chaoxi
  * @since 3.0.0 2023/5/30
  **/
-public class ProtostuffMessageCodec<T extends Message> implements PigeonMessageCodec<T> {
+public class ProtostuffPayloadCodec<T extends Message> implements PayloadCodec<T> {
     private static final DefaultIdStrategy STRATEGY = new DefaultIdStrategy(
             IdStrategy.DEFAULT_FLAGS
             | IdStrategy.MORPH_COLLECTION_INTERFACES
             | IdStrategy.MORPH_NON_FINAL_POJOS);
 
-    private final ThreadLocal<LinkedBuffer> bufferThreadLocal = ThreadLocal.withInitial(() -> LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE));
+    private final FastThreadLocal<LinkedBuffer> bufferThreadLocal = new FastThreadLocal<>() {
+        @Override
+        protected LinkedBuffer initialValue() throws Exception {
+            return LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
+        }
+    };
 
     @Override
     public int encodeTo(T source, ByteBuf buf) throws IOException {
@@ -36,8 +42,7 @@ public class ProtostuffMessageCodec<T extends Message> implements PigeonMessageC
         }
         Schema<T> schema = getSchema((Class<T>) source.getClass());
         LinkedBuffer buffer = bufferThreadLocal.get();
-        try {
-            OutputStream dataOutput = new ByteBufOutputStream(buf);
+        try (OutputStream dataOutput = new ByteBufOutputStream(buf)) {
             return ProtostuffIOUtil.writeTo(dataOutput, source, schema, buffer);
         } finally {
             buffer.clear();
@@ -62,9 +67,6 @@ public class ProtostuffMessageCodec<T extends Message> implements PigeonMessageC
         } else {
             array = ByteBufUtil.getBytes(buf, buf.readerIndex(), length, false);
             System.out.println(Arrays.toString(array));
-            for (byte b : array) {
-                System.out.println(b + " " + Integer.toBinaryString(b));
-            }
             offset = 0;
         }
 

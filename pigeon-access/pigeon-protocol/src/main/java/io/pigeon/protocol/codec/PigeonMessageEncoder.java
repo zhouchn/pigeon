@@ -1,4 +1,4 @@
-package io.pigeon.access.codec;
+package io.pigeon.protocol.codec;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -17,10 +17,10 @@ import io.pigeon.common.enums.Command;
  * @since 3.0.0 2023/5/22
  **/
 public class PigeonMessageEncoder extends MessageToByteEncoder<Message> {
-    private final MessageCodecFactory messageCodecFactory;
+    private final PayloadCodecFactory payloadCodecFactory;
 
-    public PigeonMessageEncoder(MessageCodecFactory messageCodecFactory) {
-        this.messageCodecFactory = messageCodecFactory;
+    public PigeonMessageEncoder(PayloadCodecFactory payloadCodecFactory) {
+        this.payloadCodecFactory = payloadCodecFactory;
     }
 
 
@@ -65,7 +65,7 @@ public class PigeonMessageEncoder extends MessageToByteEncoder<Message> {
         // TODO
 
         // ------ payload ----------
-        PigeonMessageCodec<Message> codec = messageCodecFactory.getCodec(protocol);
+        PayloadCodec<Message> codec = payloadCodecFactory.getCodec(protocol);
         int bodyLength = codec.encodeTo(message, byteBuf);
 
         // 序列化完后回填body的长度

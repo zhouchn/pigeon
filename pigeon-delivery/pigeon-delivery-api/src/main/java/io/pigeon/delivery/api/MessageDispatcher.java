@@ -12,4 +12,6 @@ public interface MessageDispatcher {
     double remainingRate();
 
     boolean tryDispatch(Message message);
+
+    void forceDispatch(Message message);
 }

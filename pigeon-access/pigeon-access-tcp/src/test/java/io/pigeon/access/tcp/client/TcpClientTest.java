@@ -2,6 +2,8 @@ package io.pigeon.access.tcp.client;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.concurrent.CountDownLatch;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -13,8 +15,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class TcpClientTest {
 
     @Test
-    void connect() {
+    void connect() throws Exception {
         TcpClient tcpClient = new TcpClient("127.0.0.1", 8888);
         tcpClient.connect();
+        CountDownLatch cdl = new CountDownLatch(1);
+        cdl.await();
     }
 }

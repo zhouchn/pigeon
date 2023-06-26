@@ -1,4 +1,4 @@
-package io.pigeon.access.tcp.server;
+package io.pigeon.access.tcp.handler;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelConfig;
@@ -40,17 +40,17 @@ public class MessageDispatchHandler extends SimpleChannelInboundHandler<Message>
 
     private final RegistryService registryService;
     private final MessageDispatcher messageDispatcher;
-    private final ConnectionManager connManager;
+    private final ConnectionManager connectionManager;
 
     public MessageDispatchHandler(RegistryService registryService, MessageDispatcher messageDispatcher) {
-        this.connManager = ConnectionManager.INSTANCE;
+        this.connectionManager = ConnectionManager.INSTANCE;
         this.registryService = registryService;
         this.messageDispatcher = messageDispatcher;
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        connManager.add(ctx.channel());
+        connectionManager.add(ctx.channel());
     }
 
     @Override
@@ -81,7 +81,8 @@ public class MessageDispatchHandler extends SimpleChannelInboundHandler<Message>
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Message message) throws Exception {
         loggingReceivedMessage(message);
-        if (!DISPATCH_FLAG.get()) {
+        if (!isAllowDispatchToBackend()) {
+            logger.warn("dispatch stop");
             queue.add(ctx.channel());
             ctx.channel().config().setAutoRead(false);
             return;
@@ -89,6 +90,7 @@ public class MessageDispatchHandler extends SimpleChannelInboundHandler<Message>
         boolean result = messageDispatcher.tryDispatch(message);
         if (!result && ctx.channel().isActive()) {
             queue.add(ctx.channel());
+            messageDispatcher.forceDispatch(message);
             ctx.channel().config().setAutoRead(false);
             if (DISPATCH_FLAG.compareAndSet(true, false)) {
                 checkCapacityAndAutoRead(ctx.executor(), 50);
@@ -100,8 +102,12 @@ public class MessageDispatchHandler extends SimpleChannelInboundHandler<Message>
         System.out.println();
         System.out.println(message);
         if (logger.isInfoEnabled()) {
-            logger.info("receive http request: {} ", message);
+            logger.info("receive tcp request: {} ", message);
         }
+    }
+
+    private boolean isAllowDispatchToBackend() {
+        return DISPATCH_FLAG.get();
     }
 
     private void checkCapacityAndAutoRead(EventExecutor executor, int timeout) {
@@ -149,7 +155,7 @@ public class MessageDispatchHandler extends SimpleChannelInboundHandler<Message>
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         System.out.println("close conn");
-        connManager.remove(ctx.channel());
+        connectionManager.remove(ctx.channel());
 
         RegistryInfo registryInfo = new RegistryInfo();
         registryInfo.setClientId(ctx.channel().attr(ChannelConst.CLIENT_ID).get());

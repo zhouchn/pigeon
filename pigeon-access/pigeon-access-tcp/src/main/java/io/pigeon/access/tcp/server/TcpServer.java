@@ -81,7 +81,7 @@ public class TcpServer implements PigeonServer {
                 .childOption(ChannelOption.SO_KEEPALIVE, true) // 维持链接的活跃，清理僵尸链接
                 .childOption(ChannelOption.TCP_NODELAY, true) // 关闭延迟发送功能
                 .handler(new LoggingHandler(LogLevel.DEBUG))
-                .childHandler(new ServerHandlerInitializer(options.getRegistryService(), options.getMessageDispatcher(), options.getAuthProviderList()));
+                .childHandler(new ServerHandlerInitializer(options.getRegistryService(), options.getMessageDispatcher(), options.getAuthProviderFactory()));
         ChannelFuture channelFuture = bootstrap.bind(port).sync();
         channelFuture.addListener((ChannelFutureListener) future -> {
             if (future.isSuccess()) {

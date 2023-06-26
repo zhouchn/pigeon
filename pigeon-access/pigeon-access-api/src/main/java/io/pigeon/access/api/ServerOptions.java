@@ -1,10 +1,8 @@
 package io.pigeon.access.api;
 
-import io.pigeon.auth.api.AuthProvider;
+import io.pigeon.auth.api.AuthProviderFactory;
 import io.pigeon.delivery.api.MessageDispatcher;
 import io.pigeon.registry.api.RegistryService;
-
-import java.util.List;
 
 /**
  * <description>
@@ -15,7 +13,7 @@ import java.util.List;
 public class ServerOptions {
     private Integer port;
     private RegistryService registryService;
-    private List<AuthProvider> authProviderList;
+    private AuthProviderFactory authProviderFactory;
     private MessageDispatcher messageDispatcher;
 
     public Integer getPort() {
@@ -36,12 +34,12 @@ public class ServerOptions {
         return this;
     }
 
-    public List<AuthProvider> getAuthProviderList() {
-        return authProviderList;
+    public AuthProviderFactory getAuthProviderFactory() {
+        return authProviderFactory;
     }
 
-    public ServerOptions setAuthProviderList(List<AuthProvider> authProviderList) {
-        this.authProviderList = authProviderList;
+    public ServerOptions setAuthProviderFactory(AuthProviderFactory authProviderFactory) {
+        this.authProviderFactory = authProviderFactory;
         return this;
     }
 

@@ -24,11 +24,7 @@
         </dependency>
         <dependency>
             <groupId>io.pigeon</groupId>
-            <artifactId>pigeon-access-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.pigeon.access.codec</groupId>
-            <artifactId>pigeon-access-codec</artifactId>
+            <artifactId>pigeon-protocol</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>

@@ -1,4 +1,4 @@
-package io.pigeon.access.codec;
+package io.pigeon.protocol.codec;
 
 import io.netty.buffer.ByteBuf;
 import io.pigeon.common.entity.Message;
@@ -6,12 +6,12 @@ import io.pigeon.common.entity.Message;
 import java.io.IOException;
 
 /**
- * message codec
+ * payload codec
  *
  * @author chaoxi
  * @since 3.0.0 2023/5/30
  **/
-public interface PigeonMessageCodec<T extends Message> {
+public interface PayloadCodec<T extends Message> {
     int encodeTo(T source, ByteBuf buf) throws IOException;
 
     void decodeFrom(ByteBuf buf, int length, T target);

@@ -2,6 +2,10 @@ package io.pigeon.access.tcp.server;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -13,8 +17,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class TcpServerTest {
 
     @Test
-    void listenAndServe() throws InterruptedException {
+    void listenAndServe() throws InterruptedException, ExecutionException {
         TcpServer tcpServer = new TcpServer();
         tcpServer.listenAndServe(8888);
+        CountDownLatch cdl = new CountDownLatch(1);
+        cdl.await();
     }
 }

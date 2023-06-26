@@ -1,4 +1,4 @@
-package io.pigeon.access.tcp.server;
+package io.pigeon.access.tcp.handler;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -6,11 +6,10 @@ import io.pigeon.access.tcp.internal.ClientAuthedEvent;
 import io.pigeon.access.tcp.utils.ChannelConst;
 import io.pigeon.auth.api.AuthParam;
 import io.pigeon.auth.api.AuthProvider;
+import io.pigeon.auth.api.AuthProviderFactory;
 import io.pigeon.auth.api.AuthResult;
 import io.pigeon.common.entity.AuthMessage;
-import io.pigeon.common.enums.AuthType;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -21,29 +20,11 @@ import java.util.concurrent.TimeUnit;
  * @since 3.0.0 2023/5/18
  **/
 public class AuthenticationHandler extends ChannelInboundHandlerAdapter {
-    private final AuthProvider[] authProviders;
+    private final AuthProviderFactory authProviderFactory;
 
 
-    public AuthenticationHandler(List<AuthProvider> authProviders) {
-        if (authProviders == null || authProviders.isEmpty()) {
-            this.authProviders = new AuthProvider[0];
-        } else {
-            this.authProviders = buildAuthProviders(authProviders);
-        }
-    }
-
-    private AuthProvider[] buildAuthProviders(List<AuthProvider> authProviders) {
-        int length = authProviders.stream()
-                .filter(item -> Objects.nonNull(item.support()))
-                .mapToInt(item -> item.support().getOrder())
-                .max().orElse(0);
-        AuthProvider[] result = new AuthProvider[length];
-        for (AuthProvider authProvider : authProviders) {
-            AuthType type = authProvider.support();
-            if (Objects.isNull(type)) continue;
-            result[type.getOrder()] = authProvider;
-        }
-        return result;
+    public AuthenticationHandler(AuthProviderFactory authProviderFactory) {
+        this.authProviderFactory = authProviderFactory;
     }
 
     @Override
@@ -73,10 +54,7 @@ public class AuthenticationHandler extends ChannelInboundHandlerAdapter {
     }
 
     private AuthProvider getAuthProvider(int authType) {
-        if (authType < 0 || authType >= authProviders.length) {
-            return null;
-        }
-        return this.authProviders[authType];
+        return authProviderFactory.getInstance(authType);
     }
 
     private void notSupportedAuthType(ChannelHandlerContext ctx, AuthMessage authMessage) {
@@ -88,9 +66,6 @@ public class AuthenticationHandler extends ChannelInboundHandlerAdapter {
 
         ctx.channel().attr(ChannelConst.CLIENT_ID).set(authResult.getClientId());
 
-//        ClientAuthedEvent event = new ClientAuthedEvent();
-//        event.setClientId(authResult.getClientId());
-//        event.setStreamId(ctx.channel().id().asLongText());
         ctx.fireUserEventTriggered(ClientAuthedEvent.INSTANCE);
 
         // 认证通过，移除认证处理器

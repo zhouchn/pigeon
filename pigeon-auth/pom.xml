@@ -15,6 +15,7 @@
 
     <modules>
         <module>pigeon-auth-api</module>
+        <module>pigeon-auth-default</module>
     </modules>
 
     <properties>

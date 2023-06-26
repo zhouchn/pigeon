@@ -8,7 +8,6 @@ import com.lmax.disruptor.dsl.ProducerType;
 import com.lmax.disruptor.util.DaemonThreadFactory;
 import io.pigeon.common.entity.Message;
 import io.pigeon.delivery.api.MessageDispatcher;
-import io.pigeon.delivery.api.MessageSubscriber;
 
 /**
  * <description>
@@ -17,15 +16,13 @@ import io.pigeon.delivery.api.MessageSubscriber;
  * @since 3.0.0 2023/5/21
  **/
 public class LocalMessageDispatcher implements MessageDispatcher {
-    private MessageSubscriber subscriber;
     private final RingBuffer<MessageEvent> ringBuffer;
 
     public LocalMessageDispatcher() {
         this.ringBuffer = initRingBuffer();
     }
 
-    public LocalMessageDispatcher(MessageSubscriber subscriber, RingBuffer<MessageEvent> ringBuffer) {
-        this.subscriber = subscriber;
+    public LocalMessageDispatcher(RingBuffer<MessageEvent> ringBuffer) {
         this.ringBuffer = ringBuffer;
     }
 
@@ -58,6 +55,11 @@ public class LocalMessageDispatcher implements MessageDispatcher {
     @Override
     public boolean tryDispatch(Message message) {
         return ringBuffer.tryPublishEvent((event, sequence, data) -> event.setData(data.sender()), message);
+    }
+
+    @Override
+    public void forceDispatch(Message message) {
+        ringBuffer.publishEvent((event, sequence, data) -> event.setData(data.sender()), message);
     }
 
 }
